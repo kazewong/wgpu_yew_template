@@ -5,3 +5,8 @@ address = "127.0.0.1"
 # address = "0.0.0.0"
 # The port to serve on.
 port = 8000
+
+[[hooks]]
+stage = "pre_build"
+command = "tailwindcss"
+command_arguments = ["-i", "input.css", "-o", "app.css"]
