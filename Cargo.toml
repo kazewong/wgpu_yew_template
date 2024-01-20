@@ -1,0 +1,8 @@
+[package]
+name = "wgpu_yew_template"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# this is the development version of Yew
+yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
