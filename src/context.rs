@@ -4,13 +4,13 @@ use winit::window::Window;
 use winit::event::*;
 
 pub struct WGPUContext {
-    surface: wgpu::Surface,
-    device: wgpu::Device,
-    queue: wgpu::Queue,
-    config: wgpu::SurfaceConfiguration,
-    size: winit::dpi::PhysicalSize<u32>,
-    window: Window,
-    render_pipeline: wgpu::RenderPipeline,
+    pub surface: wgpu::Surface,
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
+    pub config: wgpu::SurfaceConfiguration,
+    pub size: winit::dpi::PhysicalSize<u32>,
+    pub window: Window,
+    pub render_pipeline: wgpu::RenderPipeline,
     // compute_pipeline: wgpu::ComputePipeline,
 }
 
