@@ -7,7 +7,7 @@ pub enum AppMsg {
     Nothing
 }
 
-#[derive(PartialEq, Properties)]
+#[derive(PartialEq, Properties, Default)]
 pub struct AppProperties {}
 
 pub struct App {
@@ -26,9 +26,10 @@ impl Component for App {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
+        true
+        // match msg {
             
-        }
+        // }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
