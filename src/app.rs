@@ -1,13 +1,13 @@
 use crate::context::WGPUContext;
-
 use winit::{
-    event::WindowEvent,
     event_loop,
     window::{Window, WindowBuilder},
 };
+
 use yew::platform::spawn_local;
 use yew::prelude::*;
-use yew::{html, AttrValue, Callback, Component, Context, ContextProvider, Html};
+use yew::{html, Callback, Component, Context, Html};
+use wasm_bindgen::prelude::*;
 
 pub enum AppMsg {
     Initializing(WGPUContext),
@@ -36,17 +36,10 @@ impl Component for App {
     type Properties = AppProperties;
 
     fn create(ctx: &Context<Self>) -> Self {
-        ctx.link().send_message(AppMsg::Redraw);
-        let event_loop = event_loop::EventLoop::new();
-        let window = WindowBuilder::new()
-            .with_inner_size(winit::dpi::PhysicalSize::new(800, 600))
-            .build(&event_loop)
-            .unwrap();
-        let context_cb = ctx.link().callback(AppMsg::Initializing);
-        emit_context(window, context_cb);
+        ctx.link().send_message(AppMsg::Redraw);        
         App {
             canvas: NodeRef::default(),
-            context: None
+            context: None,
         }
     }
 
@@ -56,11 +49,9 @@ impl Component for App {
                 self.context = Some(context);
             }
             AppMsg::Initializing(_) => {
-                return false;
+                self.create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), ctx);
             }
-            AppMsg::Redraw => {
-                
-            }
+            AppMsg::Redraw => {}
             AppMsg::Nothing => {
                 return false;
             }
@@ -74,5 +65,24 @@ impl Component for App {
               <canvas ref = {self.canvas.clone()}/>
             </div>
         )
+    }
+}
+
+#[wasm_bindgen(start)]
+impl App{
+
+    fn create_context(canvas: web_sys::HtmlCanvasElement, ctx: &Context<Self>){
+        let event_loop = event_loop::EventLoop::new().unwrap();
+        #[cfg(target_arch = "wasm32")]{
+            use winit::platform::web::WindowExtWebSys;
+            let window = WindowBuilder::new()
+                .with_inner_size(winit::dpi::PhysicalSize::new(800, 600))
+                .with_canvas(canvas)
+                .build(&event_loop)
+                .unwrap();
+            let context_cb = ctx.link().callback(AppMsg::Initializing);
+            emit_context(window, context_cb);
+        }
+
     }
 }
