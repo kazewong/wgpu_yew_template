@@ -6,11 +6,16 @@ authors = ["Kaze Wong <kazewong.physics@gmail.com>"]
 license = "MIT"
 description = "A template for using wgpu with Yew"
 
+[build]
+target = "wasm32-unknown-unknown"
+
 [dependencies]
 # this is the development version of Yew
 yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
 wgpu = { version = "0.18", features = ["webgl"]}
 wasm-logger = "0.2.0"
+log = "0.4.20"
+winit = "0.28"
 
 [dependencies.web-sys]
 version = "0.3.64"
