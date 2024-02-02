@@ -18,8 +18,8 @@ impl Component for App {
     type Message = AppMsg;
     type Properties = AppProperties;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        ctx.link().send_message(App:: Redraw);
+    fn create(ctx: &Context<Self>) -> Self {
+        ctx.link().send_message(AppMsg:: Redraw);
         App {
           canvas : NodeRef::default(),
         }
