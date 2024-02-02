@@ -16,6 +16,7 @@ wgpu = { version = "0.18", features = ["webgl"]}
 wasm-logger = "0.2.0"
 log = "0.4.20"
 winit = "0.28"
+wasm-bindgen-futures = "0.4.40"
 
 [dependencies.web-sys]
 version = "0.3.64"

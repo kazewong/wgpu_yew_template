@@ -2336,6 +2336,7 @@ name = "wgpu_yew_template"
 version = "0.1.0"
 dependencies = [
  "log",
+ "wasm-bindgen-futures",
  "wasm-logger",
  "web-sys",
  "wgpu",
