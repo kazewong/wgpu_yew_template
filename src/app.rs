@@ -1,16 +1,17 @@
 use crate::context::WGPUContext;
-use winit::{
-    event_loop,
-    window::{Window, WindowBuilder},
-};
+use log::info;
+use web_sys::{console::info, Node};
+use winit::{ event_loop, window::{Window, WindowBuilder}};
 
 use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew::{html, Callback, Component, Context, Html};
 use wasm_bindgen::prelude::*;
 
+
+
 pub enum AppMsg {
-    Initializing(WGPUContext),
+    Initializing,
     Initialized(WGPUContext),
     Redraw,
     Nothing,
@@ -26,6 +27,7 @@ pub struct App {
 
 fn emit_context(window: Window, context_cb: Callback<WGPUContext>) {
     spawn_local(async move {
+        info!("Emitting context");
         let context = WGPUContext::new(window).await;
         context_cb.emit(context);
     });
@@ -36,9 +38,10 @@ impl Component for App {
     type Properties = AppProperties;
 
     fn create(ctx: &Context<Self>) -> Self {
-        ctx.link().send_message(AppMsg::Redraw);        
+        let canvas = NodeRef::default();
+        ctx.link().send_message(AppMsg::Initializing);
         App {
-            canvas: NodeRef::default(),
+            canvas: canvas,
             context: None,
         }
     }
@@ -46,10 +49,12 @@ impl Component for App {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             AppMsg::Initialized(context) => {
+                info!("Initialized");
                 self.context = Some(context);
             }
-            AppMsg::Initializing(_) => {
-                self.create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), ctx);
+            AppMsg::Initializing => {
+                info!("Initializing");
+                App::create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), ctx);
             }
             AppMsg::Redraw => {}
             AppMsg::Nothing => {
@@ -60,6 +65,7 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+
         html! (
             <div>
               <canvas ref = {self.canvas.clone()}/>
@@ -68,21 +74,21 @@ impl Component for App {
     }
 }
 
-#[wasm_bindgen(start)]
 impl App{
 
-    fn create_context(canvas: web_sys::HtmlCanvasElement, ctx: &Context<Self>){
-        let event_loop = event_loop::EventLoop::new().unwrap();
-        #[cfg(target_arch = "wasm32")]{
-            use winit::platform::web::WindowExtWebSys;
-            let window = WindowBuilder::new()
-                .with_inner_size(winit::dpi::PhysicalSize::new(800, 600))
-                .with_canvas(canvas)
-                .build(&event_loop)
-                .unwrap();
-            let context_cb = ctx.link().callback(AppMsg::Initializing);
+    pub fn create_context(canvas: web_sys::HtmlCanvasElement, ctx: &Context<Self>){
+            let event_loop = event_loop::EventLoop::new().unwrap();
+            let builder = WindowBuilder::new()
+                .with_inner_size(winit::dpi::PhysicalSize::new(800, 600));
+            #[cfg(target_arch = "wasm32")]
+            let builder = {
+                use winit::platform::web::WindowBuilderExtWebSys;
+                builder.with_canvas(Some(canvas))
+            };
+            let window = builder
+            .build(&event_loop)
+            .unwrap();
+            let context_cb = ctx.link().callback(AppMsg::Initialized);
             emit_context(window, context_cb);
-        }
-
     }
 }

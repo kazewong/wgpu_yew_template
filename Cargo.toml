@@ -6,12 +6,6 @@ authors = ["Kaze Wong <kazewong.physics@gmail.com>"]
 license = "MIT"
 description = "A template for using wgpu with Yew"
 
-[build]
-target = "wasm32-unknown-unknown"
-
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [dependencies]
 # this is the development version of Yew
 cfg-if = "0.1.10"
@@ -21,7 +15,7 @@ wasm-logger = "0.2.0"
 wasm-bindgen = "0.2.89"
 wasm-bindgen-futures = "0.4.39"
 log = "0.4.20"
-winit = { version= "0.29", features = ["rwh_05"] }
+winit = { version= "0.29.10", features = ["rwh_05"] }
 
 
 [dependencies.web-sys]
