@@ -17,6 +17,7 @@ pub struct WGPUContext {
 impl WGPUContext {
     pub async fn new(window: Window) -> Self {
         let size = window.inner_size();
+        info!("{:?}", size);
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends: wgpu::Backends::all(),
             ..Default::default()
