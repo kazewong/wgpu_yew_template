@@ -8,8 +8,6 @@ use yew::prelude::*;
 use yew::{html, Callback, Component, Context, Html};
 use wasm_bindgen::prelude::*;
 
-
-
 pub enum AppMsg {
     Initializing,
     Initialized(WGPUContext),
@@ -26,6 +24,7 @@ pub struct App {
     canvas: NodeRef,
     context: Option<WGPUContext>,
     callback: Callback<WGPUContext>,
+    initialized: bool,
 }
 
 fn emit_context(window: Window, context_cb: Callback<WGPUContext>) {
@@ -41,13 +40,14 @@ impl Component for App {
     type Properties = AppProperties;
 
     fn create(ctx: &Context<Self>) -> Self {
+        info!("Creating App");
         let canvas = NodeRef::default();
-        ctx.link().send_message(AppMsg::Initializing);
         let context_cb: Callback<WGPUContext> = ctx.link().callback(AppMsg::Initialized);
         App {
             canvas: canvas,
             context: None,
             callback: context_cb,
+            initialized: false,
         }
     }
 
@@ -58,8 +58,8 @@ impl Component for App {
                 self.context = Some(context);
             }
             AppMsg::Initializing => {
+                self.initialized = true;
                 info!("Initializing");
-                let context_cb: Callback<WGPUContext> = ctx.link().callback(AppMsg::Initialized);
                 App::create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), self);
             }
             AppMsg::Redraw => {}
@@ -71,7 +71,9 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-
+        if self.initialized != true {
+            ctx.link().send_message(AppMsg::Initializing);
+        }
         html! (
             <div>
               <canvas ref = {self.canvas.clone()}/>
