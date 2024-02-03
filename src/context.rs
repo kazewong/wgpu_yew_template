@@ -15,7 +15,7 @@ pub struct WGPUContext {
 }
 
 impl WGPUContext {
-    pub async fn new(window: Window) -> Self {
+    pub async fn new(window: Window, height: u32, width: u32) -> Self {
         let size = window.inner_size();
         info!("{:?}", size);
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
@@ -74,8 +74,8 @@ impl WGPUContext {
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
-            width: 800,//size.width,
-            height: 600,//size.height,
+            width,//size.width,
+            height,//size.height,
             present_mode: surface_caps.present_modes[0],
             alpha_mode: surface_caps.alpha_modes[0],
             view_formats: vec![],
