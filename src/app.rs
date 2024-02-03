@@ -1,7 +1,6 @@
 use crate::context::WGPUContext;
 use log::info;
-use web_sys::{console::info, Node};
-use winit::{ event_loop, window::{Window, WindowBuilder}};
+use winit::{event_loop, window::{self, Window, WindowBuilder}};
 
 use yew::platform::spawn_local;
 use yew::prelude::*;
@@ -27,13 +26,7 @@ pub struct App {
     initialized: bool,
 }
 
-fn emit_context(window: Window, context_cb: Callback<WGPUContext>) {
-    spawn_local(async move {
-        info!("Emitting context");
-        let context = WGPUContext::new(window).await;
-        context_cb.emit(context);
-    });
-}
+
 
 impl Component for App {
     type Message = AppMsg;
@@ -62,7 +55,9 @@ impl Component for App {
                 info!("Initializing");
                 App::create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), self);
             }
-            AppMsg::Redraw => {}
+            AppMsg::Redraw => {
+                false;
+            }
             AppMsg::Nothing => {
                 return false;
             }
@@ -85,10 +80,18 @@ impl Component for App {
 #[wasm_bindgen]
 impl App{
 
+    fn emit_context(window: Window, context_cb: Callback<WGPUContext>) {
+        spawn_local(async move {
+            info!("Emitting context");
+            let context = WGPUContext::new(window).await;
+            context_cb.emit(context);
+        });
+    }
+
     pub fn create_context(canvas: web_sys::HtmlCanvasElement, ctx: &mut App) {
         let event_loop = event_loop::EventLoop::new().unwrap();
         let builder = WindowBuilder::new()
-            .with_inner_size(winit::dpi::PhysicalSize::new(800, 600));
+        .with_inner_size(winit::dpi::PhysicalSize::new(800, 600));
         #[cfg(target_arch = "wasm32")]
         let builder = {
             use winit::platform::web::WindowBuilderExtWebSys;
@@ -98,7 +101,16 @@ impl App{
         let window = builder
         .build(&event_loop)
         .unwrap();
+        #[cfg(target_arch = "wasm32")]{
+            use winit::platform::web::WindowExtWebSys;
+            info!("Window: {:?}", window.inner_size());
+        }
+        info!("Window: {:?}", window.inner_size());
         let cb = ctx.callback.clone();
-        emit_context(window, cb);
+        App::emit_context(window, cb);
+    }
+
+    pub fn render(&self) {
+        info!("Rendering");
     }
 }
