@@ -2,7 +2,7 @@ use crate::context::WGPUContext;
 use log::info;
 use winit::{event_loop, window::{self, Window, WindowBuilder}};
 
-use yew::platform::spawn_local;
+use yew::{context, platform::spawn_local};
 use yew::prelude::*;
 use yew::{html, Callback, Component, Context, Html};
 use wasm_bindgen::prelude::*;
@@ -49,6 +49,7 @@ impl Component for App {
             AppMsg::Initialized(context) => {
                 info!("Initialized");
                 self.context = Some(context);
+                ctx.link().send_message(AppMsg::Redraw);
             }
             AppMsg::Initializing => {
                 self.initialized = true;
@@ -56,7 +57,9 @@ impl Component for App {
                 App::create_context(self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap(), self);
             }
             AppMsg::Redraw => {
-                false;
+                info!("Redrawing");
+                self.context.as_mut().unwrap().render();
+                true;
             }
             AppMsg::Nothing => {
                 return false;
@@ -66,6 +69,9 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        // if self.initialized == true {
+        //     ctx.link().send_message(AppMsg::Redraw);
+        // }
         if self.initialized != true {
             ctx.link().send_message(AppMsg::Initializing);
         }

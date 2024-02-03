@@ -172,6 +172,7 @@ impl WGPUContext {
     pub fn update(&mut self) {}
 
     pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+        info!("Rendering");
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
